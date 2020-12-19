@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Words Variation in Sentence</title>
+	<style type="text/css">
+		.center{
+			margin:auto;
+			width: 70%;
+			padding-bottom: 50px
+		}
+		textarea{
+			resize:none;
+		}
+		#sentence{
+			width:100%;
+			font-size:20px;
+		}
+		button{
+			font-size: 20px;
+			padding:4px 8px;
+			margin-top:8px;
+		}
+		#textboxes > input[type="text"]{
+			padding:5px;
+			font-size:20px;
+			width:100%;
+		}
+	</style>
+</head>
+<body>
+	<header style='text-align:center; padding:10px;'>
+		<h1>Word Variations in sentence</h1>
+	</header>
+
+	<main>
+		<article id="main-program" class="center">	
+			<section>
+				<textarea id="sentence" rows=5></textarea>
+				<button id="extractPlaceholders"> Extract Placeholders </button> <br/><br/>
+			</section>
+
+			<section id="textboxes"></section>
+			<section id="result"></section>
+		</article>
+	</main>
+
+	<script type="text/javascript">
+		let sentence, placeholders
+
+		let extractPlaceholdersBtn = document.getElementById("extractPlaceholders");
+		extractPlaceholdersBtn.addEventListener("click", init)
+
+		function init(){
+			// clear previous values
+			placeholders = [];
+			document.getElementById("textboxes").innerHTML = ""
+
+			// 1. Find placeholders and make text boxes for each placeholder
+			extractPlaceholders()
+			generateTextboxesForPlaceholders()	
+
+			// 2. Find Result
+		}
+
+		function extractPlaceholders(){
+			sentence = document.getElementById("sentence").value;
+			sentence = sentence.replace(/\s+/g, " ");
+			//console.log(sentence)
+
+			let words = sentence.split(" ");
+			words.forEach( (word, index)=>{
+				let regex = /\<(.*?)\>/;
+
+				if(!regex.test(word)){
+					return;
+				}
+
+				const placeholder =	word.match(regex)[0];
+				const insideWord =	word.match(regex)[1];
+				const insideWordLength = insideWord.length;
+				
+				// Check letters for < and > signs
+				if(insideWordLength >= 1)
+				{
+					// Extract letters
+					let _1st = word.charAt(0);
+					let last = word.charAt(insideWordLength - 1);
+					let _2nd = word.charAt(1)
+					let _2ndLast = word.charAt(insideWordLength - 2);
+
+					// Compare letters
+					let item = {
+						placeholder, 
+						index,
+						word: insideWord
+					};
+
+					placeholders.push(item);
+
+					/*
+					if( _1st == "<" && last == ">")
+					{
+						item["word"] = word.slice(1,word.length-1)
+						placeholders.push(item); 
+					}
+					else if( _1st == "<" && _2ndLast == ">")
+					{
+						item["word"] = word.slice(1,word.length-2)
+						placeholders.push(item); 
+					}
+					else if( _2nd == "<" && last == ">")
+					{
+						item["word"] = word.slice(2,word.length-1)
+						placeholders.push(item); 
+					}
+					else if( _2nd == "<" && _2ndLast)
+					{
+						item["word"] = word.slice(2,word.length-2) 
+						placeholders.push(item);
+					}
+					*/
+				}
+			})
+		}
+
+
+		function generateTextboxesForPlaceholders(){
+			let textboxes = document.getElementById("textboxes")
+			textboxes.innerHTML += "<h1>Placeholders</h1>";
+
+			let alreadyDonePlaceholders = [];
+			placeholders.forEach(item=>{
+				if(alreadyDonePlaceholders.includes(item.word))
+				{
+					return;
+				}
+
+				let el = `<span style="font-size:24px"> ${item.word} </span> <br/> <input type="text" class="${item.word}" name="${item.word}"> <br/><br/>` 
+				textboxes.innerHTML += el;
+				alreadyDonePlaceholders.push(item.word)
+			})
+
+			let findResultButton = document.createElement("button");
+			findResultButton.innerHTML = "Find Result";
+			findResultButton.id = "findResult";
+
+			textboxes.appendChild(findResultButton);
+			textboxes.innerHTML += "<br/><br/>"
+
+			document.getElementById("findResult").addEventListener("click", findResult.bind(null, placeholders))
+		}
+
+		function findResult(placeholders)
+		{
+			let allVariations = [];
+
+			placeholders.forEach(item=>{
+				let id = item.word;
+				let variations = document.getElementById("textboxes").getElementsByClassName(id)[0].value;
+				if(variations){
+					variations = variations.replace(/\s+/g, " ");
+					variations = variations.split(" ");
+
+					let variations2 = []
+					for(let i=0;i<variations.length; i++){
+						variations2.push({variation:variations[i] , index: item.index})
+					}
+
+					allVariations.push(variations2)
+				}
+			})
+
+
+			const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+
+  			let combinations = cartesian(...allVariations)
+			console.log(combinations)
+
+			// Make sentences out of combinations
+			let combinationSentences = [];
+			let regex = /\<(.*?)\>/;
+
+			combinations.forEach( combination=>{
+				let newWords = sentence.split(" ")
+				
+				combination.forEach(item=>{
+					let originalWord = newWords[item.index]
+					let replacedPlaceholder = originalWord.replace(regex, item.variation) 
+					newWords[item.index] = replacedPlaceholder;
+				})
+				
+				let newSentence = newWords.join(" ")
+				combinationSentences.push(newSentence)
+				console.log(newSentence)
+			})
+
+			// Display combinations in html
+			let result = document.getElementById("result")
+			result.innerHTML = "<h1> Combination Result </h1>"
+			combinationSentences.forEach(sentence=>{
+				result.innerHTML += `<p style="font-size:20px">${sentence}</p>`;
+			})
+
+		}
+
+	</script>
+
+	<script type="text/javascript">
+		function tutorial()
+		{
+			let sentence = document.getElementById("sentence")
+			let extractPlaceholdersBtn = document.getElementById("extractPlaceholders")
+
+			sentence.value = "This is a tutorial to show you how <variations> can be made of words using placeholders like <great>"
+			extractPlaceholdersBtn.click()
+		}
+
+		tutorial()
+	</script>
+</body>
+</html>
