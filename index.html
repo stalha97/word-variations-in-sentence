@@ -218,19 +218,23 @@
 
 		}
 
-	</script>
 
-	<script type="text/javascript">
 		function tutorial()
 		{
 			let sentence = document.getElementById("sentence")
 			let extractPlaceholdersBtn = document.getElementById("extractPlaceholders")
 
-			sentence.value = "This is a tutorial to show you how <variations> can be made of words using placeholders like <great>"
+			sentence.value = "This is a tutorial to <show> you how variations <work>."
 			extractPlaceholdersBtn.click()
+
+			document.getElementById("textboxes").getElementsByClassName("show")[0].value = "$how sh0w SHoW";
+			document.getElementById("textboxes").getElementsByClassName("work")[0].value = "w0rK w4rk";
+			document.getElementById("findResult").click();
 		}
 
 		tutorial()
+
 	</script>
+
 </body>
 </html>
