@@ -12,16 +12,16 @@
 		}
 		#sentence{
 			width:100%;
-			font-size:20px;
+			font-size:16px;
 		}
 		button{
-			font-size: 20px;
+			font-size: 16px;
 			padding:4px 8px;
 			margin-top:8px;
 		}
 		#textboxes > input[type="text"]{
 			padding:5px;
-			font-size:20px;
+			font-size:16px;
 			width:100%;
 		}		
 
@@ -30,6 +30,9 @@
 			padding-bottom: 50px
 		}
 
+		.text-center{
+			text-align: center
+		}
 		@media only screen and (min-width: 600px) {
 		  .center {
 			width: 70%;
@@ -48,15 +51,15 @@
 	</header>
 
 	<main>
-		<article id="main-program" class="center">	
-			<section>
+		<div id="main-program" class="center">	
+			<div>
 				<textarea id="sentence" rows=5></textarea>
 				<button id="extractPlaceholders"> Extract Placeholders </button> <br/><br/>
-			</section>
+			</div>
 
-			<section id="textboxes"></section>
-			<section id="result"></section>
-		</article>
+			<div id="textboxes"></div>
+			<div id="result"></div>
+		</div>
 	</main>
 
 	<script type="text/javascript">
@@ -141,7 +144,7 @@
 
 		function generateTextboxesForPlaceholders(){
 			let textboxes = document.getElementById("textboxes")
-			textboxes.innerHTML += "<h1>Placeholders</h1>";
+			textboxes.innerHTML += "<h1 class='text-center'>Placeholders</h1>";
 
 			let alreadyDonePlaceholders = [];
 			placeholders.forEach(item=>{
@@ -150,7 +153,7 @@
 					return;
 				}
 
-				let el = `<span style="font-size:24px"> ${item.word} </span> <br/> <input type="text" class="${item.word}" name="${item.word}"> <br/><br/>` 
+				let el = `<span style="font-size:24px"> <b>${item.word}</b> </span> <br/> <input type="text" class="${item.word}" name="${item.word}"> <br/><br/>` 
 				textboxes.innerHTML += el;
 				alreadyDonePlaceholders.push(item.word)
 			})
@@ -211,9 +214,10 @@
 
 			// Display combinations in html
 			let result = document.getElementById("result")
-			result.innerHTML = "<h1> Combination Result </h1>"
-			combinationSentences.forEach(sentence=>{
-				result.innerHTML += `<p style="font-size:20px">${sentence}</p>`;
+			result.innerHTML = "<h1 class='text-center'> Combination Result </h1>"
+			combinationSentences.forEach((sentence, index)=>{
+				console.log(index)
+				result.innerHTML += `<p style="font-size:16px">${index+1}. ${sentence}</p>`;
 			})
 
 		}
