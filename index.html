@@ -72,6 +72,7 @@
 			// clear previous values
 			placeholders = [];
 			document.getElementById("textboxes").innerHTML = ""
+			document.getElementById("result").innerHTML = ""
 
 			// 1. Find placeholders and make text boxes for each placeholder
 			extractPlaceholders()
@@ -188,12 +189,15 @@
 				}
 			})
 
+			if(allVariations.length == 0){
+				// Do nothing
+				return;
+			}
 
 			const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
 
   			let combinations = cartesian(...allVariations)
-			console.log(combinations)
-
+			
 			// Make sentences out of combinations
 			let combinationSentences = [];
 			let regex = /\<(.*?)\>/;
@@ -209,14 +213,13 @@
 				
 				let newSentence = newWords.join(" ")
 				combinationSentences.push(newSentence)
-				console.log(newSentence)
+				//console.log(newSentence)
 			})
 
 			// Display combinations in html
 			let result = document.getElementById("result")
 			result.innerHTML = "<h1 class='text-center'> Combination Result </h1>"
 			combinationSentences.forEach((sentence, index)=>{
-				console.log(index)
 				result.innerHTML += `<p style="font-size:16px">${index+1}. ${sentence}</p>`;
 			})
 
